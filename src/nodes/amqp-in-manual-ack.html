@@ -12,6 +12,7 @@
       exchangeRoutingKey: { value: '' },
       exchangeDurable: { value: true },
       queueName: { value: '' },
+      queueType: { value: 'classic'},
       queueExclusive: { value: false },
       queueDurable: { value: false },
       queueAutoDelete: { value: false },
@@ -50,6 +51,23 @@
           $('.headers-form-input').hide()
         }
       })
+
+      $('#node-input-reconnectTimeoutValue').typedInput({
+        type: 'num',
+        types: ['num'],
+      })
+
+      $("#node-input-queueType").typedInput({
+        types: [
+          {
+            value: "classic",
+            options: [
+              { value: "quorum", label: "Quorum"},
+              { value: "classic", label: "Classic"}
+            ]
+          }
+        ]
+      })
     },
   })
 </script>
@@ -75,6 +93,10 @@
   <div class="form-row">
     <label for="node-input-prefetch"><i class="fa fa-filter"></i>&nbsp;&nbsp;Prefetch</label>
     <input type="text" id="node-input-prefetch" placeholder="0 for no prefetch restriction">
+  </div>
+  <div class="form-row">
+    <label for="node-input-reconnectTimeoutValue"><i class="fa fa-clock-o"></i>&nbsp;&nbsp;Reconnect timeout value (ms)</label>
+    <input type="text" class="small-amqp-out" id="node-input-reconnectTimeoutValue">
   </div>
   <hr>
   <h4>Exchange Info</h4>
@@ -114,6 +136,10 @@
   <div class="form-row wide-label-amqp-in-manual-ack">
     <label for="node-input-queueName"><i class="fa fa-tag"></i>&nbsp;&nbsp;Queue Name</label>
     <input type="text" id="node-input-queueName" placeholder="Leave blank to auto-generate">
+  </div>
+  <div class="form-row wide-label-amqp-in-manual-ack">
+    <label for="node-input-queueName"><i class="fa fa-tag"></i>&nbsp;&nbsp;Queue Type</label>
+    <input type="text" id="node-input-queueType">
   </div>
 
   <div class="form-row">

@@ -4,11 +4,17 @@ import { ErrorType, NodeType } from '../types'
 import Amqp from '../Amqp'
 
 module.exports = function (RED: NodeRedApp): void {
-  function AmqpIn(config: EditorNodeProperties): void {
+  function AmqpIn(config: EditorNodeProperties
+    & {
+      reconnectTimeoutValue: number
+    }
+  ): void {
     let reconnectTimeout: NodeJS.Timeout
     RED.events.once('flows:stopped', () => {
       clearTimeout(reconnectTimeout)
     })
+
+    let reconnectTimeoutValue = config.reconnectTimeoutValue
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -26,7 +32,7 @@ module.exports = function (RED: NodeRedApp): void {
             } catch (e) {
               await reconnect()
             }
-          }, 2000)
+          }, reconnectTimeoutValue)
         })
 
       try {

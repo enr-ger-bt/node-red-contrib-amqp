@@ -10,12 +10,15 @@ module.exports = function (RED: NodeRedApp): void {
       exchangeRoutingKey: string
       exchangeRoutingKeyType: string
       amqpProperties: string
+      reconnectTimeoutValue: number
     },
   ): void {
     let reconnectTimeout: NodeJS.Timeout
     RED.events.once('flows:stopped', () => {
       clearTimeout(reconnectTimeout)
     })
+
+    let reconnectTimeoutValue = config.reconnectTimeoutValue
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -33,7 +36,7 @@ module.exports = function (RED: NodeRedApp): void {
             } catch (e) {
               await reconnect()
             }
-          }, 2000)
+          }, reconnectTimeoutValue)
         })
 
       try {
@@ -95,11 +98,22 @@ module.exports = function (RED: NodeRedApp): void {
                 }
                 break
             }
+            
 
-            if (!!properties?.headers?.doNotStringifyPayload) {
-              amqp.publish(payload, properties)
-            } else {
-              amqp.publish(JSON.stringify(payload), properties)
+            try {
+              //Execute publish only
+              console.log(connection)
+              if (connection) {
+                if (!!properties?.headers?.doNotStringifyPayload) {
+                  await amqp.publish(payload, properties)
+                } else {
+                  await amqp.publish(JSON.stringify(payload), properties)
+                }
+              } else {
+                throw("Connection not present, impossible to publish.")
+              }
+            } catch (e) {
+              this.error(e, msg)
             }
 
             done && done()
